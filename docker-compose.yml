@@ -1,0 +1,36 @@
+version: '2'
+services:
+    mariadb:
+        build: ./mariadb
+        container_name: server-mariadb
+        environment:
+            MYSQL_ROOT_PASSWORD: 123
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_DATABASE: db
+            MYSQL_USER: user
+            MYSQL_PASSWORD: 123
+        volumes:
+            - db:/var/lib/mysql
+    phpmyadmin:
+        container_name: server-phpmyadmin
+        image: phpmyadmin/phpmyadmin
+        links:
+            - mariadb
+        environment:
+            PMA_HOST: mariadb
+            PMA_PORT: 3306
+        ports:
+            - '8080:80'
+    php:
+        build: ./php
+        container_name: server-php
+        ports:
+            - '80:80'
+            - '443:443'
+        volumes:
+            - ./html:/var/www/html
+            - ./logs/apache2:/var/log/apache2
+        links:
+            - mariadb
+volumes:
+    db:
